@@ -1,0 +1,72 @@
+#!/usr/bin/python
+
+import cv,pygame,Image
+	
+def connectedMin(cvm,i,j):
+	w = cvm.cols 
+	h = cvm.rows
+	
+	
+	m = cv.GetReal2D(cvm,i,j)
+	if ((i-1) >= 0 and (i-1) < h and (j-1) >= 0 and (j-1) < w and cv.GetReal2D(cvm,i-1,j-1) < m):
+		m = cv.GetReal2D(cvm,i-1,j-1)	
+	if ((i-1) >= 0 and (i-1) < h and (j) >= 0 and (j) < w and cv.GetReal2D(cvm,i-1,j) < m):
+		m = cv.GetReal2D(cvm,i-1,j)	
+	if ((i-1) >= 0 and (i-1) < h and (j+1) >= 0 and (j+1) < w and cv.GetReal2D(cvm,i-1,j+1) < m):
+		m = cv.GetReal2D(cvm,i-1,j+1)
+	if ((i) >= 0 and (i) < h and (j-1) >= 0 and (j-1) < w and cv.GetReal2D(cvm,i,j-1) < m):
+		m = cv.GetReal2D(cvm,i,j-1)		
+	if ((i) >= 0 and (i) < h and (j+1) >= 0 and (j+1) < w and cv.GetReal2D(cvm,i,j+1) < m):
+		m = cv.GetReal2D(cvm,i,j+1)	
+	if ((i+1) >= 0 and (i+1) < h and (j-1) >= 0 and (j-1) < w and cv.GetReal2D(cvm,i+1,j-1) < m):
+		m = cv.GetReal2D(cvm,i+1,j-1)	
+	if ((i+1) >= 0 and (i+1) < h and (j) >= 0 and (j) < w and cv.GetReal2D(cvm,i+1,j) < m):
+		m = cv.GetReal2D(cvm,i+1,j)	
+	if ((i+1) >= 0 and (i+1) < h and (j+1) >= 0 and (j+1) < w and cv.GetReal2D(cvm,i+1,j+1) < m):
+		m = cv.GetReal2D(cvm,i+1,j+1)	
+	return m
+
+#segment image based on 8-connectivity
+def segment(im):
+	c = 1	#the count for different shape
+	for i in xrange(im.height - 1):
+		for j in xrange(im.width - 1):
+			if (cv.GetReal2D(im,i,j)>0):
+				cv.SetReal2D(im,i,j,c)
+				c = c + 1
+	im = cv.GetMat(im)
+	for i in xrange(im.rows):
+		for j in xrange(im.cols):
+			p = cv.GetReal2D(im,i,j)
+			m = connectedMin(im,i,j)	
+			if ( m < p):
+				print str(m) + " < " + str(p)
+				cv.SetReal2D(im,i,j,m) #replaced m with p
+
+cv.NamedWindow('Jim')
+
+#load mario spritesheet
+img = cv.LoadImage('Mario.png')
+ss = cv.CreateImage(cv.GetSize(img), cv.IPL_DEPTH_8U, 3);
+#tmp = cv.CreateImage(cv.GetSize(img), cv.IPL_DEPTH_8U, 1)
+
+#ss will contain the original image
+cv.Copy(img,ss)
+
+#create bw for thresholding
+bw = cv.CreateImage(cv.GetSize(img), cv.IPL_DEPTH_8U, 1);
+#replace background
+cv.FloodFill(img,(0,0),(0,0,0))
+cv.CvtColor(img,bw,cv.CV_BGR2GRAY)
+cv.Threshold(bw,bw,1,1,cv.CV_THRESH_BINARY)
+
+tmp = cv.CloneImage(bw)
+
+segment(tmp)
+
+cv.ShowImage('Jim',tmp)
+cv.WaitKey()
+print type(bw)
+
+
+		

@@ -16,13 +16,13 @@ class Tile:
 	#elevation - self explanatory
 	#block is a list of block objects 
 	def __init__(self, tileType=TILE_FLOOR,tiledex=0,elevation=0,blocks=None):
-		tileType = TILE_FLOOR
+		tileType = Tile.TILE_FLOOR
 		tiledex = 0
 		elevation = 0
 
 class Level:
-	tilewidth = 16
-	tileheight = 16
+	tilewidth = 16	#pixel width of tile
+	tileheight = 16 #pixel height of tile
 	xtiles	= 500#width of level, essentially
 	ytiles = 30
 	tilesheet = []	#the tilesheet!
@@ -61,6 +61,11 @@ def level0Init():
 def cellParse(cell):
 	ssplit = string.split(cell,';')
 	t = Tile();
+	t.tiledex = ssplit[0]
+	t.tileType= ssplit[1]
+	t.elevation= ssplit[2]
+	t.hasBlocks= ssplit[3]
+	
 	
 
 #parse a csv file that describes a level
@@ -79,7 +84,7 @@ def levelParse(filename):
 		if (lnum ==0):	#read in width,tilesheet
 			width = csplit[0]
 			tileFile = csplit[1]	
-		else if (lnum <= 31):	#now we are parsing the tiles	
+		if (lnum <= 31):	#now we are parsing the tiles	
 			y = lnum - 1
 			for x in range(len(csplit)):
 				cell = csplit[x]

@@ -16,9 +16,9 @@ class Tile:
 	#elevation - self explanatory
 	#block is a list of block objects 
 	def __init__(self, tileType=TILE_FLOOR,tiledex=0,elevation=0,blocks=None):
-		tileType = Tile.TILE_FLOOR
-		tiledex = 0
-		elevation = 0
+		self.tileType = Tile.TILE_FLOOR
+		self.tiledex = 0
+		self.elevation = 0
 
 class Level:
 	tilewidth = 16	#pixel width of tile
@@ -28,9 +28,14 @@ class Level:
 	tilesheet = []	#the tilesheet!
 	layout = []#2d array of tiles
 	surf = None
-	def __init__(self):
-		self.tilesheet = spritesheet.loadTileSheet('SMB-Tiles.png',self.tilewidth,self.tileheight,1,1)	
+	def __init__(self,xt,yt,filename,tw=16,th=16):
+		self.xtiles = xt
+		self.ytiles = yt
+		self.tilewidth = tw
+		self.tileheight = th
+		self.tilesheet = spritesheet.loadTileSheet(filename,self.tilewidth,self.tileheight,1,1)	
 		self.layout = []
+		print "xtiles is: " + str(self.xtiles);
 		for i in xrange(self.xtiles):
 			self.layout.append([])
 			for j in xrange(self.ytiles):
@@ -45,6 +50,7 @@ class Level:
 					self.surf.blit(self.tilesheet[tdex],(i*self.tilewidth,j*self.tileheight))
 		return self.surf
 
+#this is just a simple test that makes an easy level pattern
 def level0Init():
 	l0 = Level();
 	for i in xrange(l0.xtiles):
@@ -58,7 +64,8 @@ def level0Init():
 
 
 #each cell represents a tile in following format: tile index;tileType;elevation;hasBlocks
-def cellParse(cell):
+def parseCell(cell):
+	print "Cell: "+str(cell)+"\n"
 	ssplit = string.split(cell,';')
 	t = Tile();
 	t.tiledex = ssplit[0]
@@ -73,20 +80,23 @@ def cellParse(cell):
 #first line:	width(tiles),tilesheet (filename)
 #next 30 lines describe the tiles
 #each cell represents a tile in following format: tile index;tileType;elevation;hasBlocks
-def levelParse(filename):
-	l = Level()
+def parseLevel(filename):
+	l = None
 	width = 500
 	tileFile = None
 	f = open(filename, 'r')
 	lnum = 0
 	for line in f:
 		csplit = string.split(line,',')
-		if (lnum ==0):	#read in width,tilesheet
+		if (lnum == 0):	#read in width,tilesheet
 			width = csplit[0]
 			tileFile = csplit[1]	
-		if (lnum <= 31):	#now we are parsing the tiles	
-			y = lnum - 1
+			print "width is " + str(width);
+			l = Level(width,30,'SMB-Tiles.png')
+		elif (lnum <= 31):	#now we are parsing the tiles	
+			y = lnum - 31
 			for x in range(len(csplit)):
 				cell = csplit[x]
-				l.layout[x][y]	= cellParse(cell)	
+				l.layout[x][y]	= parseCell(cell)	
 		lnum = lnum + 1
+	return l;

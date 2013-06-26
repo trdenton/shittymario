@@ -14,7 +14,7 @@ from pygame.locals import *
 
 def loadTileSheet(filename,width,height,xspace=0,yspace=0): 
 	global screen
-	img = pygame.image.load(filename).convert()
+	img = pygame.image.load(filename)#.convert()
 	xtiles = 0
 	ytiles = 0
 	tiles = []
@@ -28,7 +28,7 @@ def loadTileSheet(filename,width,height,xspace=0,yspace=0):
 	for j in range(ytiles):
 		for i in range(xtiles):
 			r = pygame.Rect((i*width + (i)*xspace,j*height + (j)*yspace),(width,height))
-			subsurf = pygame.Surface(r.size).convert()
+			subsurf = pygame.Surface(r.size)#.convert()
 			subsurf.blit(img,(0,0),r)
 			#screen.blit(subsurf,r)
 			tiles.append(subsurf)	

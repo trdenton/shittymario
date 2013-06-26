@@ -5,6 +5,7 @@ class keyboard:
 	left = False
 	up = False
 	down = False
+	space = False
 	@classmethod
 	def getInput(cls):
 		for event in pygame.event.get():
@@ -14,5 +15,6 @@ class keyboard:
 			elif event.key == K_LEFT:cls.left = down
 			elif event.key == K_UP: cls.up = down
 			elif event.key == K_DOWN: cls.down = down
+			elif event.key == K_SPACE: cls.space = down
 			elif event.key == K_ESCAPE: exit()     # quit the game
 

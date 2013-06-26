@@ -23,7 +23,7 @@ class Tile:
 class Level:
 	tilewidth = 16	#pixel width of tile
 	tileheight = 16 #pixel height of tile
-	xtiles	= 500#width of level, essentially
+	xtiles	= 500	#width of level, essentially
 	ytiles = 30
 	tilesheet = []	#the tilesheet!
 	layout = []#2d array of tiles
@@ -46,7 +46,10 @@ class Level:
 			self.surf = pygame.Surface((self.xtiles*self.tilewidth,self.ytiles*self.tileheight)).convert()
 			for i in xrange(self.xtiles):
 				for j in xrange(self.ytiles):
+					print "i is " + str(i)
+					print "j is " + str(j)
 					tdex = self.layout[i][j].tiledex
+					print type(self.layout[i][j])
 					self.surf.blit(self.tilesheet[tdex],(i*self.tilewidth,j*self.tileheight))
 		return self.surf
 
@@ -65,13 +68,14 @@ def level0Init():
 
 #each cell represents a tile in following format: tile index;tileType;elevation;hasBlocks
 def parseCell(cell):
-	print "Cell: "+str(cell)+"\n"
+	#print "Cell: "+str(cell)
 	ssplit = string.split(cell,';')
 	t = Tile();
-	t.tiledex = ssplit[0]
-	t.tileType= ssplit[1]
-	t.elevation= ssplit[2]
-	t.hasBlocks= ssplit[3]
+	t.tiledex = int(ssplit[0])
+	t.tileType= int(ssplit[1])
+	t.elevation= int(ssplit[2])
+	t.hasBlocks= int(ssplit[3])
+	return t
 	
 	
 
@@ -92,11 +96,10 @@ def parseLevel(filename):
 			width = csplit[0]
 			tileFile = csplit[1]	
 			print "width is " + str(width);
-			l = Level(width,30,'SMB-Tiles.png')
+			l = Level(int(width),30,'SMB-Tiles.png')
 		elif (lnum <= 31):	#now we are parsing the tiles	
 			y = lnum - 31
 			for x in range(len(csplit)):
-				cell = csplit[x]
-				l.layout[x][y]	= parseCell(cell)	
+				l.layout[x][y]	= parseCell(csplit[x])	
 		lnum = lnum + 1
 	return l;

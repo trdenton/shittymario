@@ -4,7 +4,6 @@
 # a horrible program written to produce level files.
 # TODO: add ability to specify width
 # TODO: add ability to change tile properties other than graphics
-# TODO: add ability to scroll through width
 # TODO: add export functionality
 
 
@@ -69,7 +68,7 @@ class TButt(Butt):
 				self.setImage(self.tiledex)		
 				#print "OVER!"
 			if (dragBoxMode):
-				print "DRAGBOX"
+				#print "DRAGBOX"
 				dragBoxMode_point = (self.x,self.y)
 				
 						
@@ -100,7 +99,7 @@ def selectTile(x):
 	def ret():
 		global currentTile
 		currentTile=x
-		print "current tile is " + str(currentTile)
+		#print "current tile is " + str(currentTile)
 	return ret
 
 def keyPressHandler (event):
@@ -115,10 +114,14 @@ def keyPressHandler (event):
 		dragBoxMode = 1- dragBoxMode
 		if (dragBoxMode == 1):
 			dragBoxMode_orig = currentButton
-	print event.keysym
+	#print event.keysym
 def mouseUp (event):
 	mouseIsDown=0
-	print "up"
+	#print "up"
+
+def resize_frame (e):
+	global canvas
+	canvas.configure(scrollregion=canvas.bbox("all"))
 
 print "done!"
 root = Tk()
@@ -127,8 +130,21 @@ root.bind('<KeyPress>', keyPressHandler)
 topFrame = Frame(root)
 topFrame.pack(side=TOP)
 topFrame.focus_set()
+
+canvas = Canvas(topFrame,height="720",width="720")
+tileFrame = Frame(canvas)
+hsb = Scrollbar(topFrame, orient="horizontal", command=canvas.xview)
+
+canvas.pack(side=TOP,expand=True)
+hsb.pack(side=TOP,fill="y")
+canvas.create_window((8,8),window=tileFrame,anchor="nw")
+canvas.configure(xscrollcommand=hsb.set)
+canvas.bind("<Configure>",resize_frame)
+
+
 middleFrame = Frame(root,bg="red")
 middleFrame.pack(side=TOP)
+
 seperator = Label(middleFrame,text="^^MAP  VV TILES")
 seperator.pack(side=LEFT)
 #currentTileImage = Button(middleFrame)
@@ -136,10 +152,10 @@ bottomFrame=Frame(root)
 bottomFrame.pack(side=BOTTOM)
 root.title('Shitty Mario Level Editor')
 
-for x in range(30):
+for x in range(50):
 	tbutts.append([])
 	for y in range(30):
-		b = TButt(topFrame,0,x,y)
+		b = TButt(tileFrame,0,x,y)
 		tbutts[x].append(b)
 		tbutts[x][y].b.config(image=b.image)
 		tbutts[x][y].b.grid(row=x,column=y)
@@ -157,7 +173,7 @@ def task():
 	global dragBoxMode_orig
 	global dragBoxMode_point
 	global dragBoxMode
-	print dragBoxMode_orig
+	#print dragBoxMode_orig
 	if (dragBoxMode):
 		fillSquare(dragBoxMode_orig,dragBoxMode_point)	
 	else:

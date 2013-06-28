@@ -62,32 +62,36 @@ class App(Tk):
 		currentTileDex = 0
 		self.drawMode = App.DRAW_SINGLE
 		self.currentTile = (0,0)
-		self.drawRect_orig = (0,0)
-		self.drawRect_point = (5,5)
+		self.currentMouse=(0,0)
+		self.drawRectOrigTile = (0,0)
+		self.drawRectPointTile = (5,5)
+		self.drawRectOrigMouse = (0,0)
+		self.drawRectPointMouse = (5,5)
 
-		self.maxsize(900,800)
+		self.maxsize(600,1000)
 
 		#setup tk stuff
 		self.bind('<KeyPress>', self.keyPressHandler)
-		self.topFrame = Frame(self)
-		self.topFrame.pack(side=TOP,expand=False)
-		self.topFrame.focus_set()
+		#self.topFrame = Frame(self)
+		#self.topFrame.pack(side=TOP,expand=False)
+		#self.topFrame.focus_set()
 
-		self.canvas = Canvas(self.topFrame,height="720",width="7200")
-		self.hsb = Scrollbar(self.topFrame, orient="horizontal", command=self.canvas.xview)
+		self.canvas = Canvas(self,height="480",width="4800",bg="white")
+		self.canvas.pack()
+		self.middleFrame = Frame(self,width="480",height="32")
+		self.middleFrame.pack(side=TOP)
+		self.middleFrame.pack_propagate(0)
+		self.hsb = Scrollbar(self.middleFrame, orient="horizontal", command=self.canvas.xview)
 
-		self.canvas.pack(side=TOP,expand=True)
-		self.hsb.pack(side=TOP,fill="y")
-		self.canvas.configure(xscrollcommand=self.hsb.set,scrollregion=(0,0,480,480),confine=True)
+		self.hsb.pack(side=TOP,fill=X)
+		self.canvas.configure(xscrollcommand=self.hsb.set,xscrollincrement=16)
 		self.canvas.bind("<Configure>",self.resize_frame)
 		self.canvas.bind("<Button-1>",self.leftClickHandler)
 		self.canvas.bind("<Motion>",self.motionHandler)
 
-		self.middleFrame = Frame(self)
-		self.middleFrame.pack(side=TOP)
 
 		self.seperator = Label(self.middleFrame,text="^^MAP  VV TILES")
-		self.seperator.pack(side=LEFT)
+		self.seperator.pack(side=BOTTOM)
 
 		self.bottomFrame=Frame(self)
 		self.bottomFrame.pack(side=BOTTOM)
@@ -99,7 +103,7 @@ class App(Tk):
 		self.setupTileButtons()
 
 		#setup tile structures
-		for x in range(30):
+		for x in range(300):
 			self.tiles.append([])
 			for y in range(30):
 				self.tiles[x].append(Tile(x,y))
@@ -107,19 +111,24 @@ class App(Tk):
 	def motionHandler(self,mevent):
 		#print dir(event)
 		#print "currentTiledex " + str(self.currentTileDex)
+		self.currentMouse = (self.canvas.canvasx(mevent.x),self.canvas.canvasy(mevent.y))
 		self.currentTile = (int(self.canvas.canvasx( int(mevent.x/16))),int( self.canvas.canvasy(int(mevent.y/16))))
 		print self.currentTile
 		print "x,y: " +  str(mevent.x) + ", " + str(mevent.y)
 		if (self.drawMode == App.DRAW_FREE):
 			self.drawCurrentTile(event=mevent)
 		elif (self.drawMode == App.DRAW_RECT):
-			self.drawRect_point = self.currentTile
+			self.drawRectPointTile = self.currentTile
+			self.drawRectPointMouse = self.currentMouse
 			#can we do something to draw a temporary box?
 			#ie just draw a shitty rectangle... refresh image, then draw
-			self.refreshTiles()
-			start=tuple(16*x for x in self.drawRect_orig)
-			end=tuple(16*(x + 1)  for x in self.drawRect_point)
-			self.canvas.create_rectangle( start,end ,outline="green",width="3")
+			#self.refreshTiles()
+			self.canvas.delete("selection")
+			start = self.drawRectOrigMouse
+			end = self.drawRectPointMouse
+			#start=tuple(16*x for x in self.drawRectOrigTile)
+			#end=tuple(16*(x + 1)  for x in self.drawRectPointTile)
+			self.canvas.create_rectangle( start,end ,outline="green",width="3",tag="selection")
 					
 
 	def drawCurrentTile(self, event=None,tilex=0,tiley=0):
@@ -133,7 +142,6 @@ class App(Tk):
 		self.tiles[tilex][tiley].tiledex = currentTileDex
 		self.tiles[tilex][tiley].image = convertImage(self.tilesheet[currentTileDex])
 		self.canvas.create_image((16*tilex,16*tiley),image=self.tiles[tilex][tiley].image,anchor="nw")
-		print "printler"
 	
 	def refreshTiles(self):
 		self.canvas.delete("all")
@@ -153,8 +161,11 @@ class App(Tk):
 			self.cbutts.append(c)
 
 	def fillSquare( self):
-		orig = self.drawRect_orig
-		end = self.drawRect_point
+		#orig = self.drawRectOrigTile
+		#end = self.drawRectPointTile
+		orig = tuple(int(x/16) for x in self.drawRectOrigMouse)
+		end = tuple(int(x/16) for x in self.drawRectPointMouse)
+		#end = self.drawRectPointMouse
 		for x in range(min(orig[0],end[0]),max(orig[0],end[0])+1):
 			for y in range(min(orig[1],end[1]),max(orig[1],end[1])+1):
 				self.drawCurrentTile(tilex=x,tiley=y) #use none because we dont have an event object, use x and y
@@ -170,12 +181,16 @@ class App(Tk):
 			self.drawMode = App.DRAW_SINGLE
 		elif (event.keysym == "Shift_L" and self.drawMode == App.DRAW_SINGLE):
 			self.drawMode = App.DRAW_RECT
-			self.drawRect_orig = self.currentTile
-			self.drawRect_point = self.currentTile
+			self.drawRectOrigTile = self.currentTile
+			self.drawRectOrigMouse = self.currentMouse
+			self.drawRectPointTile = self.currentTile
+			self.drawRectPointMouse = self.currentMouse
 		elif (event.keysym == "Shift_L" and self.drawMode == App.DRAW_RECT):
 			self.drawMode = App.DRAW_SINGLE
 			self.refreshTiles()
 			self.fillSquare()
+		elif (event.keysym == "r"):
+			self.refreshTiles()
 	
 	def resize_frame (self,e):
 		self.canvas.configure(scrollregion=self.canvas.bbox("all"))
@@ -183,7 +198,7 @@ class App(Tk):
 		
 	
 	def task(self):
-		#print drawRect_orig
+		#print drawRectOrigTile
 
 		#self.drawTileButtons()
 		#self.drawCanvas()

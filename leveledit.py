@@ -16,6 +16,9 @@ from PIL import Image
 import pygame
 from pygame.locals import *
 
+currentTileDex = 0
+
+
 def convertImage(im):
 	image_str = pygame.image.tostring(im, 'RGB')         # use 'RGB' to export
 	w, h      = (16, 16)
@@ -33,9 +36,9 @@ class tileButton(Button):
 	def setImage(self, i):
 		self.image = convertImage(i)
 	def clickHandler(self,event):
-		self.master.currentTileDex = self.tiledex
-		print dir(self.master)
-		#print "currentTileDex is " + str(self.master.currentTileDex)
+		global currentTileDex
+		currentTileDex = self.tiledex
+		print "currentTileDex is " + str(currentTileDex)
 
 
 class Tile:
@@ -52,16 +55,15 @@ class App(Tk):
 		self.initialize()
 	
 	def initialize(self):
+		global currentTileDex
 		self.cbutts=[]	#control buttons - the ones to select current tile
 		self.tiles=[]	#tile buttons - the ones that make up the map
 		#some variables to keep track of drawing state
-		self.currentTileDex = 0
+		currentTileDex = 0
 		self.drawMode = App.DRAW_SINGLE
-		self.dragMode = 0	#freeform drawing
-		self.dragBoxMode=0	#drawing a rectangle
 		self.currentTile = (0,0)
-		self.dragBoxMode_orig = (0,0)
-		self.dragBoxMode_point = (5,5)
+		self.drawRect_orig = (0,0)
+		self.drawRect_point = (5,5)
 
 		self.maxsize(900,800)
 
@@ -76,12 +78,12 @@ class App(Tk):
 
 		self.canvas.pack(side=TOP,expand=True)
 		self.hsb.pack(side=TOP,fill="y")
-		self.canvas.configure(xscrollcommand=self.hsb.set)
+		self.canvas.configure(xscrollcommand=self.hsb.set,scrollregion=(0,0,480,480),confine=True)
 		self.canvas.bind("<Configure>",self.resize_frame)
 		self.canvas.bind("<Button-1>",self.leftClickHandler)
 		self.canvas.bind("<Motion>",self.motionHandler)
 
-		self.middleFrame = Frame(self,bg="red")
+		self.middleFrame = Frame(self)
 		self.middleFrame.pack(side=TOP)
 
 		self.seperator = Label(self.middleFrame,text="^^MAP  VV TILES")
@@ -102,22 +104,42 @@ class App(Tk):
 			for y in range(30):
 				self.tiles[x].append(Tile(x,y))
 	
-	def motionHandler(self,event):
+	def motionHandler(self,mevent):
+		#print dir(event)
 		#print "currentTiledex " + str(self.currentTileDex)
+		self.currentTile = (int(self.canvas.canvasx( int(mevent.x/16))),int( self.canvas.canvasy(int(mevent.y/16))))
+		print self.currentTile
+		print "x,y: " +  str(mevent.x) + ", " + str(mevent.y)
 		if (self.drawMode == App.DRAW_FREE):
-			self.drawCurrentTile(event)
+			self.drawCurrentTile(event=mevent)
 		elif (self.drawMode == App.DRAW_RECT):
-			print "ha"
+			self.drawRect_point = self.currentTile
+			#can we do something to draw a temporary box?
+			#ie just draw a shitty rectangle... refresh image, then draw
+			self.refreshTiles()
+			start=tuple(16*x for x in self.drawRect_orig)
+			end=tuple(16*(x + 1)  for x in self.drawRect_point)
+			self.canvas.create_rectangle( start,end ,outline="green",width="3")
+					
 
-	def drawCurrentTile(self, event):
-		x = self.canvas.canvasx(event.x)
-		y = self.canvas.canvasy(event.y)
-		#get the tile to which this refers...
-		tilex = int(x/16)
-		tiley = int(y/16)
-		self.tiles[tilex][tiley].tiledex = self.currentTileDex
-		self.tiles[tilex][tiley].image = convertImage(self.tilesheet[self.currentTileDex])
+	def drawCurrentTile(self, event=None,tilex=0,tiley=0):
+		global currentTileDex
+		if event is not None:
+			x = self.canvas.canvasx(event.x)
+			y = self.canvas.canvasy(event.y)
+			#get the tile to which this refers...
+			tilex = int(x/16)
+			tiley = int(y/16)
+		self.tiles[tilex][tiley].tiledex = currentTileDex
+		self.tiles[tilex][tiley].image = convertImage(self.tilesheet[currentTileDex])
 		self.canvas.create_image((16*tilex,16*tiley),image=self.tiles[tilex][tiley].image,anchor="nw")
+		print "printler"
+	
+	def refreshTiles(self):
+		self.canvas.delete("all")
+		for x in range(len(self.tiles)):
+			for y in range(len(self.tiles[0])):
+				self.canvas.create_image((16*x,16*y),image=self.tiles[x][y].image,anchor="nw")
 
 	def leftClickHandler(self,event):
 		self.drawCurrentTile(event)
@@ -130,29 +152,30 @@ class App(Tk):
 			c.grid(row= (x / 30),column= (x%30))
 			self.cbutts.append(c)
 
-#	need to rewrite this badboy		
-#	def fillSquare( orig, end ):
-#		self.currentTileDex
-#		self.tbutts
-#		for x in range(min(orig[0],end[0]),max(orig[0],end[0])+1):
-#			for y in range(min(orig[1],end[1]),max(orig[1],end[1])+1):
-#				
-#				b = tbutts[x][y].setTile()
-#				b()
-#				#b.b.config(image=b.image)
-#				#b.b.grid(row=b.x,column=b.y)	
-#			
+	def fillSquare( self):
+		orig = self.drawRect_orig
+		end = self.drawRect_point
+		for x in range(min(orig[0],end[0]),max(orig[0],end[0])+1):
+			for y in range(min(orig[1],end[1]),max(orig[1],end[1])+1):
+				self.drawCurrentTile(tilex=x,tiley=y) #use none because we dont have an event object, use x and y
+			
 	
 			
 	
 	
 	def keyPressHandler (self,event):
-		if (event.keysym == "space"):
-			self.dragMode=1-self.dragMode
-		if (event.keysym == "Shift_L"):
-			self.dragBoxMode = 1 - self.dragBoxMode
-			if (self.dragBoxMode == 1):
-				self.dragBoxMode_orig = self.currentTile
+		if (event.keysym == "space" and self.drawMode == App.DRAW_SINGLE):
+			self.drawMode = App.DRAW_FREE
+		elif (event.keysym == "space" and self.drawMode == App.DRAW_FREE):
+			self.drawMode = App.DRAW_SINGLE
+		elif (event.keysym == "Shift_L" and self.drawMode == App.DRAW_SINGLE):
+			self.drawMode = App.DRAW_RECT
+			self.drawRect_orig = self.currentTile
+			self.drawRect_point = self.currentTile
+		elif (event.keysym == "Shift_L" and self.drawMode == App.DRAW_RECT):
+			self.drawMode = App.DRAW_SINGLE
+			self.refreshTiles()
+			self.fillSquare()
 	
 	def resize_frame (self,e):
 		self.canvas.configure(scrollregion=self.canvas.bbox("all"))
@@ -160,13 +183,7 @@ class App(Tk):
 		
 	
 	def task(self):
-		#print dragBoxMode_orig
-			
-		if (self.dragBoxMode):
-			fillSquare(self.dragBoxMode_orig,self.dragBoxMode_point)	
-		else:
-			self.dragBoxMode_orig = self.currentTile
-			self.dragBoxMode_point = self.currentTile
+		#print drawRect_orig
 
 		#self.drawTileButtons()
 		#self.drawCanvas()

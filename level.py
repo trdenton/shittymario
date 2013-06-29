@@ -35,7 +35,7 @@ class Level:
 		self.tileheight = th
 		self.tilesheet = spritesheet.loadTileSheet(filename,self.tilewidth,self.tileheight,1,1)	
 		self.layout = []
-		print "xtiles is: " + str(self.xtiles);
+		#print "xtiles is: " + str(self.xtiles);
 		for i in xrange(self.xtiles):
 			self.layout.append([])
 			for j in xrange(self.ytiles):
@@ -46,10 +46,10 @@ class Level:
 			self.surf = pygame.Surface((self.xtiles*self.tilewidth,self.ytiles*self.tileheight)).convert()
 			for i in xrange(self.xtiles):
 				for j in xrange(self.ytiles):
-					print "i is " + str(i)
-					print "j is " + str(j)
+					#print "i is " + str(i)
+					#print "j is " + str(j)
 					tdex = self.layout[i][j].tiledex
-					print type(self.layout[i][j])
+					#print type(self.layout[i][j])
 					self.surf.blit(self.tilesheet[tdex],(i*self.tilewidth,j*self.tileheight))
 		return self.surf
 
@@ -95,7 +95,7 @@ def parseLevel(filename):
 		if (lnum == 0):	#read in width,tilesheet
 			width = csplit[0]
 			tileFile = csplit[1]	
-			print "width is " + str(width);
+			#print "width is " + str(width);
 			l = Level(int(width),30,'SMB-Tiles.png')
 		elif (lnum <= 31):	#now we are parsing the tiles	
 			y = lnum - 31

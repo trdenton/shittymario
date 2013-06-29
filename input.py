@@ -1,11 +1,13 @@
 import pygame
 from pygame.locals import *
-class keyboard:
+class Keyboard:
 	right = False
 	left = False
 	up = False
 	down = False
 	space = False
+	a = False
+	z = False
 	@classmethod
 	def getInput(cls):
 		for event in pygame.event.get():
@@ -16,5 +18,7 @@ class keyboard:
 			elif event.key == K_UP: cls.up = down
 			elif event.key == K_DOWN: cls.down = down
 			elif event.key == K_SPACE: cls.space = down
+			elif event.key == K_z: cls.z = down
+			elif event.key == K_a: cls.a = down
 			elif event.key == K_ESCAPE: exit()     # quit the game
 

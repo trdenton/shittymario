@@ -12,6 +12,7 @@ import spritesheet
 import Tkinter
 import ImageTk
 from Tkinter import *
+import tkFileDialog
 from PIL import Image
 import pygame
 from pygame.locals import *
@@ -47,6 +48,8 @@ class Tile:
 		self.y=y
 		self.tiledex = tdex
 		self.image = None
+	def toString(self):
+		return str(self.tiledex)+";1;1;1"
 class App(Tk):
 	(DRAW_SINGLE,DRAW_FREE,DRAW_RECT) = range(0,3)
 	def __init__(self,parent):
@@ -104,6 +107,16 @@ class App(Tk):
 			self.tiles.append([])
 			for y in range(30):
 				self.tiles[x].append(Tile(x,y))
+
+
+
+		#set up menus
+		# create a toplevel menu
+		self.menubar = Menu(self)
+		self.menubar.add_command(label="Export...", command=self.exportCSV)
+	
+		# display the menu
+		self.config(menu=self.menubar)
 	
 	def motionHandler(self,mevent):
 		#print dir(event)
@@ -193,6 +206,12 @@ class App(Tk):
 		self.canvas.configure(scrollregion=self.canvas.bbox("all"))
 	
 		
+	def exportCSV(self ):
+		fileName = tkFileDialog.asksaveasfilename(parent=self,filetypes=[("CSV File", "*.csv")],title="Save as...")
+		f = open(fileName,'w')
+		for y in range(len(self.tiles[0])):
+			 f.write( ",".join(self.tiles[x][y].toString() for x in range(len(self.tiles))) + "\n")
+			
 	
 	def task(self):
 		#print drawRectOrigTile

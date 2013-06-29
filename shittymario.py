@@ -18,7 +18,7 @@ print "Loading..."
 #tiles = spritesheet.loadTileSheet('SMB-Tiles.png',16,16,1,1)
 mar = spritesheet.loadSpriteSheet('Mario.png')
 print "Done!"
-l0 = level.parseLevel('leveltest.csv');
+l0 = level.parseLevel('test.csv');
 print "l0 is type:"
 print type(l0);
 l0s = l0.getSurf()

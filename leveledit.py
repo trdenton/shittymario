@@ -70,21 +70,18 @@ class App(Tk):
 
 		self.maxsize(600,1000)
 
-		#setup tk stuff
-		self.bind('<KeyPress>', self.keyPressHandler)
-		#self.topFrame = Frame(self)
-		#self.topFrame.pack(side=TOP,expand=False)
-		#self.topFrame.focus_set()
 
-		self.canvas = Canvas(self,height="480",width="4800",bg="white")
+		self.canvas = Canvas(self,bg="white",height="480",scrollregion=(0,0,4800,480))
 		self.canvas.pack()
 		self.middleFrame = Frame(self,width="480",height="32")
 		self.middleFrame.pack(side=TOP)
 		self.middleFrame.pack_propagate(0)
-		self.hsb = Scrollbar(self.middleFrame, orient="horizontal", command=self.canvas.xview)
 
+		self.hsb = Scrollbar(self.middleFrame, orient="horizontal", command=self.canvas.xview)
 		self.hsb.pack(side=TOP,fill=X)
-		self.canvas.configure(xscrollcommand=self.hsb.set,xscrollincrement=16)
+		self.canvas.configure(xscrollcommand=self.hsb.set,xscrollincrement=16,confine=True)
+
+		self.bind('<KeyPress>', self.keyPressHandler)
 		self.canvas.bind("<Configure>",self.resize_frame)
 		self.canvas.bind("<Button-1>",self.leftClickHandler)
 		self.canvas.bind("<Motion>",self.motionHandler)

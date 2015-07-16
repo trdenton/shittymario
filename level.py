@@ -1,6 +1,7 @@
 import pygame
 import spritesheet
 import string
+import sys
 
 #blocks float above tiles
 class Block:
@@ -19,6 +20,18 @@ class Tile:
 		self.tileType = Tile.TILE_FLOOR
 		self.tiledex = 0
 		self.elevation = 0
+		self.blocks=blocks
+
+
+	'''
+	write out tile particulars
+	'''
+	#format: tile index;tileType;elevation;hasBlocks
+	def write(self):
+		hasBlocks=0
+		if self.blocks is not None:
+			hsaBlocks=1
+		sys.stdout.write( "%d;%d;%d;%d" % (self.tiledex,self.tileType,self.elevation,hasBlocks) )
 
 class Level:
 	tilewidth = 16	#pixel width of tile
@@ -26,6 +39,7 @@ class Level:
 	xtiles	= 500	#width of level, essentially
 	ytiles = 30
 	tilesheet = []	#the tilesheet!
+	self.tilesheetFilename=None
 	layout = []#2d array of tiles
 	surf = None
 	def __init__(self,xt,yt,filename,tw=16,th=16):
@@ -34,6 +48,7 @@ class Level:
 		self.tilewidth = tw
 		self.tileheight = th
 		self.tilesheet = spritesheet.loadTileSheet(filename,self.tilewidth,self.tileheight,1,1)	
+		self.tilesheetFilename=filename
 		self.layout = []
 		print "xtiles is: " + str(self.xtiles);
 		for i in xrange(self.xtiles):
@@ -46,12 +61,25 @@ class Level:
 			self.surf = pygame.Surface((self.xtiles*self.tilewidth,self.ytiles*self.tileheight)).convert()
 			for i in xrange(self.xtiles):
 				for j in xrange(self.ytiles):
-					print "i is " + str(i)
-					print "j is " + str(j)
+					#print "i is " + str(i)
+					#print "j is " + str(j)
 					tdex = self.layout[i][j].tiledex
-					print type(self.layout[i][j])
+					#print type(self.layout[i][j])
 					self.surf.blit(self.tilesheet[tdex],(i*self.tilewidth,j*self.tileheight))
 		return self.surf
+
+	'''
+	write out level particulars
+	'''
+	def writeLevel(self):
+		sys.stdout.write("%d,%s\n" % (self.xtiles,self.tilesheetFilename) )
+		for i in xrange(self.xtiles):
+			for j in xrange(self.ytiles):
+				self.layout[i][j].write()
+				if ( i == self.xtiles - 1):
+					sys.stdout.write("\n")
+				else
+					sys.stdout.write(",")
 
 #this is just a simple test that makes an easy level pattern
 def level0Init():

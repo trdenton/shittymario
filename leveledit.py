@@ -154,7 +154,7 @@ class App(Tk):
 		for x in range(len(self.tilesheet)):
 			c = tileButton(self.bottomFrame,self.tilesheet[x],x)
 			c.config(image=c.image)#command=    need to make new tile picking handler
-			c.grid(row= (x / 30),column= (x%30))
+			c.grid(row= (x / 25),column= (x%25))
 			self.cbutts.append(c)
 
 	def fillSquare( self):

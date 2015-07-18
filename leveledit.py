@@ -195,8 +195,11 @@ class App(Tk):
 	def exportCSV(self ):
 		fileName = tkFileDialog.asksaveasfilename(parent=self,filetypes=[("CSV File", "*.csv")],title="Save as...")
 		f = open(fileName,'w')
-		for y in range(len(self.tiles[0])):
-			 f.write( ",".join(self.tiles[x][y].toString() for x in range(len(self.tiles))) + "\n")
+		self.level.write(f)
+		print "DONE WRITING"
+		#for y in range(len(self.tiles[0])):
+		#	 f.write( ",".join(self.tiles[x][y].toString() for x in range(len(self.tiles))) + "\n")
+		
 			
 	
 	def task(self):

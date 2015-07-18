@@ -29,11 +29,11 @@ class Tile:
 	write out tile particulars
 	'''
 	#format: tile index;tileType;elevation;hasBlocks
-	def write(self):
+	def write(self,fhandle):
 		hasBlocks=0
 		if self.blocks is not None:
 			hsaBlocks=1
-		sys.stdout.write( "%d;%d;%d;%d" % (self.tiledex,self.tileType,self.elevation,hasBlocks) )
+		fhandle.write( "%d;%d;%d;%d" % (self.tiledex,self.tileType,self.elevation,hasBlocks) )
 
 class Level:
 	tilewidth = 16	#pixel width of tile
@@ -73,15 +73,15 @@ class Level:
 	'''
 	write out level particulars
 	'''
-	def writeLevel(self):
-		sys.stdout.write("%d,%s\n" % (self.xtiles,self.tilesheetFilename) )
+	def write(self,fhandle):
+		fhandle.write("%d,%s\n" % (self.xtiles,self.tilesheetFilename) )
 		for i in xrange(self.xtiles):
 			for j in xrange(self.ytiles):
-				self.layout[i][j].write()
+				self.layout[i][j].write(fhandle)
 				if ( i == self.xtiles - 1):
-					sys.stdout.write("\n")
+					fhandle.write("\n")
 				else:
-					sys.stdout.write(",")
+					fhandle.write(",")
 
 #this is just a simple test that makes an easy level pattern
 def level0Init():

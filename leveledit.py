@@ -57,7 +57,6 @@ class App(Tk):
 	def initialize(self):
 		global currentTileDex
 		self.cbutts=[]	#control buttons - the ones to select current tile
-		self.tiles=[]	#tile buttons - the ones that make up the map
 		#some variables to keep track of drawing state
 		currentTileDex = 0
 		self.drawMode = App.DRAW_SINGLE
@@ -102,11 +101,8 @@ class App(Tk):
 		
 		self.setupTileButtons()
 
-		#setup tile structures
-		for x in range(300):
-			self.tiles.append([])
-			for y in range(30):
-				self.tiles[x].append(Tile(x,y))
+
+		self.level = level.Level(300,30,"SMB-Tiles.png")
 	
 	def motionHandler(self,mevent):
 		#print dir(event)
@@ -114,7 +110,7 @@ class App(Tk):
 		self.currentMouse = (self.canvas.canvasx(mevent.x),self.canvas.canvasy(mevent.y))
 		self.currentTile = (int(self.canvas.canvasx( int(mevent.x/16))),int( self.canvas.canvasy(int(mevent.y/16))))
 		print self.currentTile
-		print "x,y: " +  str(mevent.x) + ", " + str(mevent.y)
+		#print "x,y: " +  str(mevent.x) + ", " + str(mevent.y)
 		if (self.drawMode == App.DRAW_FREE):
 			self.drawCurrentTile(event=mevent)
 		elif (self.drawMode == App.DRAW_RECT):
@@ -139,15 +135,17 @@ class App(Tk):
 			#get the tile to which this refers...
 			tilex = int(x/16)
 			tiley = int(y/16)
-		self.tiles[tilex][tiley].tiledex = currentTileDex
-		self.tiles[tilex][tiley].image = convertImage(self.tilesheet[currentTileDex])
-		self.canvas.create_image((16*tilex,16*tiley),image=self.tiles[tilex][tiley].image,anchor="nw")
+		self.level.layout[tilex][tiley].tiledex = currentTileDex
+		#self.level.layout[tilex][tiley].image = convertImage(self.tilesheet[currentTileDex])
+		img = convertImage(self.tilesheet[currentTileDex])
+		self.canvas.create_image((16*tilex,16*tiley),image=img,anchor="nw")
 	
 	def refreshTiles(self):
 		self.canvas.delete("all")
-		for x in range(len(self.tiles)):
-			for y in range(len(self.tiles[0])):
-				self.canvas.create_image((16*x,16*y),image=self.tiles[x][y].image,anchor="nw")
+		for x in range(len(self.level.layout)):
+			for y in range(len(self.level.layout[0])):
+				img = self.tilesheet[self.level.layout[x][y].tiledex]
+				self.canvas.create_image((16*x,16*y),image=img,anchor="nw")
 
 	def leftClickHandler(self,event):
 		self.drawCurrentTile(event)

@@ -39,7 +39,7 @@ class Level:
 	xtiles	= 500	#width of level, essentially
 	ytiles = 30
 	tilesheet = []	#the tilesheet!
-	self.tilesheetFilename=None
+	tilesheetFilename=None
 	layout = []#2d array of tiles
 	surf = None
 	def __init__(self,xt,yt,filename,tw=16,th=16):
@@ -78,7 +78,7 @@ class Level:
 				self.layout[i][j].write()
 				if ( i == self.xtiles - 1):
 					sys.stdout.write("\n")
-				else
+				else:
 					sys.stdout.write(",")
 
 #this is just a simple test that makes an easy level pattern

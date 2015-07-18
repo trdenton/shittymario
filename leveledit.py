@@ -8,6 +8,7 @@
 
 
 import level
+from level import Tile
 import spritesheet
 import Tkinter
 import ImageTk
@@ -41,15 +42,6 @@ class tileButton(Button):
 		currentTileDex = self.tiledex
 		print "currentTileDex is " + str(currentTileDex)
 
-
-class Tile:
-	def __init__(self, x=0,y=0,tdex=0):
-		self.x=x
-		self.y=y
-		self.tiledex = tdex
-		self.image = None
-	def toString(self):
-		return str(self.tiledex)+";1;1;1"
 class App(Tk):
 	(DRAW_SINGLE,DRAW_FREE,DRAW_RECT) = range(0,3)
 	def __init__(self,parent):
@@ -115,7 +107,7 @@ class App(Tk):
 		#print "currentTiledex " + str(self.currentTileDex)
 		self.currentMouse = (self.canvas.canvasx(mevent.x),self.canvas.canvasy(mevent.y))
 		self.currentTile = (int(self.canvas.canvasx( int(mevent.x/16))),int( self.canvas.canvasy(int(mevent.y/16))))
-		print self.currentTile
+		#print self.currentTile
 		#print "x,y: " +  str(mevent.x) + ", " + str(mevent.y)
 		if (self.drawMode == App.DRAW_FREE):
 			self.drawCurrentTile(event=mevent)
@@ -141,17 +133,17 @@ class App(Tk):
 			#get the tile to which this refers...
 			tilex = int(x/16)
 			tiley = int(y/16)
-		self.level.layout[tilex][tiley].tiledex = currentTileDex
+		
 		#self.level.layout[tilex][tiley].image = convertImage(self.tilesheet[currentTileDex])
-		img = convertImage(self.tilesheet[currentTileDex])
-		self.canvas.create_image((16*tilex,16*tiley),image=img,anchor="nw")
+		self.level.layout[tilex][tiley].img = convertImage(self.tilesheet[currentTileDex])
+		self.canvas.create_image((16*tilex,16*tiley),image=self.level.layout[tilex][tiley].img,anchor="nw")
 	
 	def refreshTiles(self):
 		self.canvas.delete("all")
 		for x in range(len(self.level.layout)):
 			for y in range(len(self.level.layout[0])):
-				img = self.tilesheet[self.level.layout[x][y].tiledex]
-				self.canvas.create_image((16*x,16*y),image=img,anchor="nw")
+				if self.level.layout[x][y].img is not None:
+					self.canvas.create_image((16*x,16*y),image=self.level.layout[x][y].img,anchor="nw")
 
 	def leftClickHandler(self,event):
 		self.drawCurrentTile(event)

@@ -21,6 +21,8 @@ class Tile:
 		self.tiledex = 0
 		self.elevation = 0
 		self.blocks=blocks
+		#only used in level editor
+		self.img = None
 
 
 	'''

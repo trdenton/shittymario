@@ -134,6 +134,7 @@ class App(Tk):
 			tilex = int(x/16)
 			tiley = int(y/16)
 		
+		self.level.layout[tilex][tiley].tiledex = currentTileDex
 		#self.level.layout[tilex][tiley].image = convertImage(self.tilesheet[currentTileDex])
 		self.level.layout[tilex][tiley].img = convertImage(self.tilesheet[currentTileDex])
 		self.canvas.create_image((16*tilex,16*tiley),image=self.level.layout[tilex][tiley].img,anchor="nw")

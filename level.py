@@ -32,7 +32,7 @@ class Tile:
 	def write(self,fhandle):
 		hasBlocks=0
 		if self.blocks is not None:
-			hsaBlocks=1
+			hasBlocks=1
 		fhandle.write( "%d;%d;%d;%d" % (self.tiledex,self.tileType,self.elevation,hasBlocks) )
 
 class Level:
@@ -75,10 +75,10 @@ class Level:
 	'''
 	def write(self,fhandle):
 		fhandle.write("%d,%s\n" % (self.xtiles,self.tilesheetFilename) )
-		for i in xrange(self.xtiles):
-			for j in xrange(self.ytiles):
-				self.layout[i][j].write(fhandle)
-				if ( i == self.xtiles - 1):
+		for y in xrange(self.ytiles):
+			for x in xrange(self.xtiles):
+				self.layout[x][y].write(fhandle)
+				if ( x == self.xtiles - 1):
 					fhandle.write("\n")
 				else:
 					fhandle.write(",")

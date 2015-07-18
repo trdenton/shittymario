@@ -12,6 +12,7 @@ import spritesheet
 import Tkinter
 import ImageTk
 from Tkinter import *
+import tkFileDialog
 from PIL import Image
 import pygame
 from pygame.locals import *
@@ -47,6 +48,8 @@ class Tile:
 		self.y=y
 		self.tiledex = tdex
 		self.image = None
+	def toString(self):
+		return str(self.tiledex)+";1;1;1"
 class App(Tk):
 	(DRAW_SINGLE,DRAW_FREE,DRAW_RECT) = range(0,3)
 	def __init__(self,parent):
@@ -69,21 +72,18 @@ class App(Tk):
 
 		self.maxsize(600,1000)
 
-		#setup tk stuff
-		self.bind('<KeyPress>', self.keyPressHandler)
-		#self.topFrame = Frame(self)
-		#self.topFrame.pack(side=TOP,expand=False)
-		#self.topFrame.focus_set()
 
-		self.canvas = Canvas(self,height="480",width="4800",bg="white")
+		self.canvas = Canvas(self,bg="white",height="480",scrollregion=(0,0,4800,480))
 		self.canvas.pack()
 		self.middleFrame = Frame(self,width="480",height="32")
 		self.middleFrame.pack(side=TOP)
 		self.middleFrame.pack_propagate(0)
-		self.hsb = Scrollbar(self.middleFrame, orient="horizontal", command=self.canvas.xview)
 
+		self.hsb = Scrollbar(self.middleFrame, orient="horizontal", command=self.canvas.xview)
 		self.hsb.pack(side=TOP,fill=X)
-		self.canvas.configure(xscrollcommand=self.hsb.set,xscrollincrement=16)
+		self.canvas.configure(xscrollcommand=self.hsb.set,xscrollincrement=16,confine=True)
+
+		self.bind('<KeyPress>', self.keyPressHandler)
 		self.canvas.bind("<Configure>",self.resize_frame)
 		self.canvas.bind("<Button-1>",self.leftClickHandler)
 		self.canvas.bind("<Motion>",self.motionHandler)
@@ -103,6 +103,12 @@ class App(Tk):
 
 
 		self.level = level.Level(300,30,"SMB-Tiles.png")
+		
+		self.menubar = Menu(self)
+		self.menubar.add_command(label="Export...", command=self.exportCSV)
+	
+		# display the menu
+		self.config(menu=self.menubar)
 	
 	def motionHandler(self,mevent):
 		#print dir(event)
@@ -194,6 +200,12 @@ class App(Tk):
 		self.canvas.configure(scrollregion=self.canvas.bbox("all"))
 	
 		
+	def exportCSV(self ):
+		fileName = tkFileDialog.asksaveasfilename(parent=self,filetypes=[("CSV File", "*.csv")],title="Save as...")
+		f = open(fileName,'w')
+		for y in range(len(self.tiles[0])):
+			 f.write( ",".join(self.tiles[x][y].toString() for x in range(len(self.tiles))) + "\n")
+			
 	
 	def task(self):
 		#print drawRectOrigTile

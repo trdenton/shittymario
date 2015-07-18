@@ -50,7 +50,7 @@ class Level:
 		self.tilesheet = spritesheet.loadTileSheet(filename,self.tilewidth,self.tileheight,1,1)	
 		self.tilesheetFilename=filename
 		self.layout = []
-		print "xtiles is: " + str(self.xtiles);
+		#print "xtiles is: " + str(self.xtiles);
 		for i in xrange(self.xtiles):
 			self.layout.append([])
 			for j in xrange(self.ytiles):
@@ -123,7 +123,7 @@ def parseLevel(filename):
 		if (lnum == 0):	#read in width,tilesheet
 			width = csplit[0]
 			tileFile = csplit[1]	
-			print "width is " + str(width);
+			#print "width is " + str(width);
 			l = Level(int(width),30,'SMB-Tiles.png')
 		elif (lnum <= 31):	#now we are parsing the tiles	
 			y = lnum - 31
